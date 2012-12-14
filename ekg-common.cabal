@@ -20,7 +20,7 @@ library
   exposed-modules:     System.Remote.Counter
                        System.Remote.Gauge
                        System.Remote.Label
-                       System.Remote.Level
+                       System.Remote.PullGauge
                        System.Remote.GHC
                        System.Remote.Ekg
                        System.Remote.Registry
@@ -28,7 +28,7 @@ library
   other-modules:       System.Remote.Counter.Internal
                        System.Remote.Gauge.Internal
                        System.Remote.Label.Internal
-                       System.Remote.Level.Internal
+                       System.Remote.PullGauge.Internal
                        System.Remote.Registry.Internal
 
   build-depends:       aeson < 0.7,

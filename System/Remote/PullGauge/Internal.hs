@@ -1,7 +1,7 @@
 {-# OPTIONS_HADDOCK not-home #-}
-module System.Remote.Level.Internal
+module System.Remote.PullGauge.Internal
     (
-      Level(..)
+      PullGauge(..)
     , new
     , read
     ) where
@@ -10,14 +10,14 @@ import Data.IORef (IORef, newIORef, readIORef)
 import Prelude hiding (read)
 
 -- | A mutable, integer-valued gauge.
-newtype Level = C { unC :: IORef (IO Int) }
+newtype PullGauge = C { unC :: IORef (IO Int) }
 
 -- | Create a new, zero initialized, gauge.
-new :: IO (Level)
+new :: IO (PullGauge)
 new = C `fmap` newIORef (return 0)
 
-read :: Level -> IO Int
-read level = do 
-                ref <- readIORef . unC $ level
+read :: PullGauge -> IO Int
+read pullGauge = do 
+                ref <- readIORef . unC $ pullGauge
                 value <- ref
                 return value

@@ -15,11 +15,11 @@ module System.Remote.Ekg
       getCounter
     , getGauge
     , getLabel
-    , getLevel
+    , getPullGauge
     , Label
     , Counter
     , Gauge
-    , Level
+    , PullGauge
     , Registry
     , newRegistry
     , Stats(..)
@@ -61,7 +61,7 @@ import System.Remote.GHC
 -- returned JSON objects, one attribute per counter, gauge or label.
 -- In addition to user-defined counters, gauges, and labels, the below
 -- built-in counters and gauges are also returned.  Furthermore, the
--- top-level JSON object of any resource contains the
+-- top-pullGauge JSON object of any resource contains the
 -- @server_timestamp_millis@ attribute, which indicates the server
 -- time, in milliseconds, when the sample was taken.
 --
@@ -136,14 +136,14 @@ import System.Remote.GHC
 
 -- $userdefined
 -- A registry can store user-defined,
--- integer-valued counters, gauges and levels, and string-value labels.  A
+-- integer-valued counters, gauges and pullGauges, and string-value labels.  A
 -- counter is a monotonically increasing value (e.g. TCP connections
 -- established since program start.) A gauge is a variable value
 -- (e.g. the current number of concurrent connections.) A label is a
 -- free-form string value (e.g. exporting the command line arguments
--- or host name.) A level is a variable value that is updated automatically
+-- or host name.) A pullGauge is a variable value that is updated automatically
 -- each time it is observed (e.g. 'IO Int' for looking up the size of a 
--- 'Data.Map' inside an 'IORef'). Each counter, gauge, level and label is
+-- 'Data.Map' inside an 'IORef'). Each counter, gauge, pullGauge and label is
 -- associated with a name, which is used when it is displayed in the UI
 -- or returned in a JSON object.
 --
@@ -173,17 +173,17 @@ data Stats = Stats {
     counters  :: ![(T.Text, Json)],       -- Counters
     gauges    :: ![(T.Text, Json)],       -- Gauges
     labels    :: ![(T.Text, Json)],       -- Labels
-    levels    :: ![(T.Text, Json)],       -- Levels
+    pullGauges    :: ![(T.Text, Json)],       -- PullGauges
     timestamp ::  {-# UNPACK #-} !Double  -- Milliseconds since epoch
   }
 
 instance A.ToJSON Stats where
-    toJSON (Stats counters gauges labels levels t) =
+    toJSON (Stats counters gauges labels pullGauges t) =
         A.object $      
         convert counters ++
         convert gauges ++
         convert labels ++
-        convert levels
+        convert pullGauges
         where convert = map (uncurry (.=))
 
 
@@ -204,9 +204,9 @@ takeSnapshot reg = do
     counters <- readAllRefs $ Registry.userCounters reg
     gauges   <- readAllRefs $ Registry.userGauges reg
     labels   <- readAllRefs $ Registry.userLabels reg
-    levels   <- readAllRefs $ Registry.userLevels reg
+    pullGauges   <- readAllRefs $ Registry.userPullGauges reg
     time     <- getTimeMillis
-    return $ Stats counters gauges labels levels time
+    return $ Stats counters gauges labels pullGauges time
     
 
 -- Existential wrapper used for OO-style polymorphism.

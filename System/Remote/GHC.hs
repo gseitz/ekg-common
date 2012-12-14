@@ -8,7 +8,7 @@ module System.Remote.GHC
 import qualified GHC.Stats as Stats
 
 import System.Remote.Registry
-import qualified System.Remote.Level as L
+import qualified System.Remote.PullGauge as L
 
 
 
@@ -81,8 +81,8 @@ initializeBuiltInStats reg = do
     intLvl Stats.parMaxBytesCopied "par_max_bytes_copied"
     return () 
   where 
-    intLvl f name = setLevel name $ fmap (fromIntegral . f) getGcStats
-    doubleLvl f name = setLevel name $ fmap (fromIntegral . round . f) getGcStats
-    setLevel name io = do
-      lvl <- getLevel name reg
+    intLvl f name = setPullGauge name $ fmap (fromIntegral . f) getGcStats
+    doubleLvl f name = setPullGauge name $ fmap (fromIntegral . round . f) getGcStats
+    setPullGauge name io = do
+      lvl <- getPullGauge name reg
       L.set lvl io

@@ -11,11 +11,11 @@ module System.Remote.Registry.Internal
 import System.Remote.Gauge
 import System.Remote.Counter
 import System.Remote.Label
-import System.Remote.Level
+import System.Remote.PullGauge
 import qualified System.Remote.Gauge.Internal as Gauge
 import qualified System.Remote.Counter.Internal as Counter
 import qualified System.Remote.Label.Internal as Label
-import qualified System.Remote.Level.Internal as Level
+import qualified System.Remote.PullGauge.Internal as PullGauge
 import qualified Data.Text as T
 import qualified Data.HashMap.Strict as M
 import Data.IORef (IORef, atomicModifyIORef, newIORef)
@@ -30,15 +30,15 @@ type Gauges = M.HashMap T.Text Gauge
 -- Map of user-defined labels.
 type Labels = M.HashMap T.Text Label
 
--- Map of user-defined levels.
-type Levels = M.HashMap T.Text Level
+-- Map of user-defined pullGauges.
+type PullGauges = M.HashMap T.Text PullGauge
 
 -- | A handle that can be used as a centralized point of access and/or grouping mechanism for metrics.
 data Registry = Registry {
       userCounters :: !(IORef Counters)
     , userGauges :: !(IORef Gauges)
     , userLabels :: !(IORef Labels)
-    , userLevels :: !(IORef Levels)
+    , userPullGauges :: !(IORef PullGauges)
     }
 
 -- Creates an empty Registry
@@ -47,8 +47,8 @@ newRegistry = do
     counters <- newIORef M.empty
     gauges <- newIORef M.empty
     labels <- newIORef M.empty
-    levels <- newIORef M.empty
-    return $ Registry counters gauges labels levels
+    pullGauges <- newIORef M.empty
+    return $ Registry counters gauges labels pullGauges
 
 
 class Ref r t | r -> t where
@@ -67,9 +67,9 @@ instance Ref Label T.Text where
     new = Label.new
     read = Label.read
 
-instance Ref Level Int where
-    new = Level.new
-    read = Level.read
+instance Ref PullGauge Int where
+    new = PullGauge.new
+    read = PullGauge.read
 
 -- | Lookup a 'Ref' by name in the given map.  If no 'Ref' exists
 -- under the given name, create a new one, insert it into the map and

@@ -9,23 +9,23 @@ module System.Remote.Registry
     , getCounter
     , getGauge
     , getLabel
-    , getLevel
+    , getPullGauge
     , hasCounter
     , hasGauge
     , hasLabel
-    , hasLevel
+    , hasPullGauge
     , newRegistry
     , Counter
     , Gauge
     , Label
-    , Level
+    , PullGauge
     , Ref
     ) where
 
 import System.Remote.Gauge
 import System.Remote.Counter
 import System.Remote.Label
-import System.Remote.Level
+import System.Remote.PullGauge
 import System.Remote.Registry.Internal
 import qualified Data.Text as T
 import qualified Data.HashMap.Strict as M
@@ -59,14 +59,14 @@ getLabel :: T.Text  -- ^ Label name
          -> IO Label
 getLabel name registry = getRef name (userLabels registry)
 
--- | Return the level associated with the given name and registry.
--- Multiple calls to 'getLevel' with the same arguments will return
--- the same level.  The first time 'getLevel' is called for a given
--- name and registry, a new, empty level will be returned.
-getLevel :: T.Text -- ^ Level name
-		 -> Registry -- ^ Registry that contains the level		 
-		 -> IO Level
-getLevel name registry = getRef name (userLevels registry)	
+-- | Return the pullGauge associated with the given name and registry.
+-- Multiple calls to 'getPullGauge' with the same arguments will return
+-- the same pullGauge.  The first time 'getPullGauge' is called for a given
+-- name and registry, a new, empty pullGauge will be returned.
+getPullGauge :: T.Text -- ^ PullGauge name
+		 -> Registry -- ^ Registry that contains the pullGauge		 
+		 -> IO PullGauge
+getPullGauge name registry = getRef name (userPullGauges registry)	
 
 hasCounter :: T.Text -- ^ Counter name
            -> Registry
@@ -84,10 +84,10 @@ hasLabel :: T.Text -- ^ Label name
          -> IO Bool
 hasLabel name registry = hasRef name $ userGauges registry
 
-hasLevel :: T.Text -- ^ Level name
+hasPullGauge :: T.Text -- ^ PullGauge name
          -> Registry
          -> IO Bool
-hasLevel name registry = hasRef name $ userLevels registry
+hasPullGauge name registry = hasRef name $ userPullGauges registry
 
 hasRef :: Ref r t => T.Text
        -> IORef (M.HashMap T.Text (r))

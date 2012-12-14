@@ -28,7 +28,7 @@ main = do
             loop n
     loop 1000000
     stats  <- takeSnapshot reg
-    let lvls = map (\(x, y) -> (x, toJSON y)) $ levels stats
+    let lvls = map (\(x, y) -> (x, toJSON y)) $ pullGauges stats
     let ctrs = map (\(x, y) -> (x, toJSON y)) $ counters stats
-    putStrLn("Levels: \n" ++ show lvls)
+    putStrLn("PullGauges: \n" ++ show lvls)
     putStrLn("Counters: \n" ++ show ctrs)
