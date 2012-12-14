@@ -8,16 +8,18 @@ import Control.Concurrent
 import Control.Exception
 import qualified System.Remote.Counter as Counter
 import qualified System.Remote.Label as Label
-import System.Remote.Monitoring
+import System.Remote.Ekg
+import Data.Aeson
 
 mean :: Fractional a => [a] -> a
 mean xs = sum xs / fromIntegral (length xs)
 
 main :: IO ()
 main = do
-    handle <- forkServer "localhost" 8000
-    counter <- getCounter "iterations" handle
-    label <- getLabel "args" handle
+    reg <- newRegistry
+    initializeBuiltInStats reg
+    counter <- getCounter "iterations" reg
+    label <- getLabel "args" reg
     Label.set label "some text string"
     let loop n = do
             evaluate $ mean [1..n]
@@ -25,3 +27,8 @@ main = do
             Counter.inc counter
             loop n
     loop 1000000
+    stats  <- takeSnapshot reg
+    let lvls = map (\(x, y) -> (x, toJSON y)) $ levels stats
+    let ctrs = map (\(x, y) -> (x, toJSON y)) $ counters stats
+    putStrLn("Levels: \n" ++ show lvls)
+    putStrLn("Counters: \n" ++ show ctrs)
