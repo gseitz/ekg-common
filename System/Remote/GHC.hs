@@ -8,10 +8,6 @@ module System.Remote.GHC
 import qualified GHC.Stats as Stats
 
 import System.Remote.Registry
-import qualified System.Remote.PullGauge as L
-
-
-
 
 emptyGCStats :: Stats.GCStats
 emptyGCStats = Stats.GCStats
@@ -39,9 +35,6 @@ emptyGCStats = Stats.GCStats
     , parMaxBytesCopied      = 0
     }
 
-
-
-
 getGcStats :: IO Stats.GCStats
 getGcStats = do
 #if MIN_VERSION_base(4,6,0)
@@ -52,7 +45,6 @@ getGcStats = do
 #else
     Stats.getGCStats
 #endif
-
 
 initializeBuiltInStats :: Registry -> IO ()
 initializeBuiltInStats reg = do      
@@ -81,8 +73,5 @@ initializeBuiltInStats reg = do
     intLvl Stats.parMaxBytesCopied "par_max_bytes_copied"
     return () 
   where 
-    intLvl f name = setPullGauge name $ fmap (fromIntegral . f) getGcStats
-    doubleLvl f name = setPullGauge name $ fmap (fromIntegral . round . f) getGcStats
-    setPullGauge name io = do
-      lvl <- getPullGauge name reg
-      L.set lvl io
+    intLvl f name = newPullGauge name reg $ fmap (fromIntegral . f) getGcStats
+    doubleLvl f name = newPullGauge name reg $ fmap (fromIntegral . round . f) getGcStats

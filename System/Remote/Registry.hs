@@ -9,7 +9,7 @@ module System.Remote.Registry
     , getCounter
     , getGauge
     , getLabel
-    , getPullGauge
+    , newPullGauge
     , hasCounter
     , hasGauge
     , hasLabel
@@ -23,9 +23,13 @@ module System.Remote.Registry
     ) where
 
 import System.Remote.Gauge
+import qualified System.Remote.Gauge.Internal as G
 import System.Remote.Counter
+import qualified System.Remote.Counter.Internal as C
 import System.Remote.Label
+import qualified System.Remote.Label.Internal as L
 import System.Remote.PullGauge
+import qualified System.Remote.PullGauge.Internal as P
 import System.Remote.Registry.Internal
 import qualified Data.Text as T
 import qualified Data.HashMap.Strict as M
@@ -39,7 +43,7 @@ import Data.IORef (IORef, readIORef)
 getCounter :: T.Text  -- ^ Counter name
            -> Registry  -- ^ Registry that contains the counter
            -> IO Counter
-getCounter name registry = getRef name (userCounters registry)
+getCounter name registry = getRef name C.new (userCounters registry)
 
 -- | Return the gauge associated with the given name and registry.
 -- Multiple calls to 'getGauge' with the same arguments will return
@@ -48,7 +52,7 @@ getCounter name registry = getRef name (userCounters registry)
 getGauge :: T.Text  -- ^ Gauge name
          -> Registry  -- ^ Registry that contains the gauge
          -> IO Gauge
-getGauge name registry = getRef name (userGauges registry)
+getGauge name registry = getRef name G.new (userGauges registry)
 
 -- | Return the label associated with the given name and registry.
 -- Multiple calls to 'getLabel' with the same arguments will return
@@ -57,16 +61,17 @@ getGauge name registry = getRef name (userGauges registry)
 getLabel :: T.Text  -- ^ Label name
          -> Registry  -- ^ Registry that contains the label
          -> IO Label
-getLabel name registry = getRef name (userLabels registry)
+getLabel name registry = getRef name L.new (userLabels registry)
 
 -- | Return the pullGauge associated with the given name and registry.
 -- Multiple calls to 'getPullGauge' with the same arguments will return
 -- the same pullGauge.  The first time 'getPullGauge' is called for a given
 -- name and registry, a new, empty pullGauge will be returned.
-getPullGauge :: T.Text -- ^ PullGauge name
-		 -> Registry -- ^ Registry that contains the pullGauge		 
+newPullGauge :: T.Text -- ^ PullGauge name
+		 -> Registry -- ^ Registry that contains the pullGauge
+         -> IO Int
 		 -> IO PullGauge
-getPullGauge name registry = getRef name (userPullGauges registry)	
+newPullGauge name registry value = getRef name (return $ P.new value) (userPullGauges registry)
 
 hasCounter :: T.Text -- ^ Counter name
            -> Registry

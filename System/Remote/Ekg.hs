@@ -15,7 +15,7 @@ module System.Remote.Ekg
       getCounter
     , getGauge
     , getLabel
-    , getPullGauge
+    , newPullGauge
     , Label
     , Counter
     , Gauge
@@ -178,7 +178,7 @@ data Stats = Stats {
   }
 
 instance A.ToJSON Stats where
-    toJSON (Stats counters gauges labels pullGauges t) =
+    toJSON (Stats counters gauges labels pullGauges _) =
         A.object $      
         convert counters ++
         convert gauges ++

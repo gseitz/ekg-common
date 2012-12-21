@@ -52,23 +52,18 @@ newRegistry = do
 
 
 class Ref r t | r -> t where
-    new :: IO r
     read :: r -> IO t
 
 instance Ref Counter Int where
-    new = Counter.new
     read = Counter.read
 
 instance Ref Gauge Int where
-    new = Gauge.new
     read = Gauge.read
 
 instance Ref Label T.Text where
-    new = Label.new
     read = Label.read
 
 instance Ref PullGauge Int where
-    new = PullGauge.new
     read = PullGauge.read
 
 -- | Lookup a 'Ref' by name in the given map.  If no 'Ref' exists
@@ -76,9 +71,10 @@ instance Ref PullGauge Int where
 -- return it.
 getRef :: Ref r t
        => T.Text                      -- ^ 'Ref' name
+       -> IO r                        -- ^ the 'Ref', in case it doesn't exist yet
        -> IORef (M.HashMap T.Text r)  -- ^ Server that will serve the 'Ref'
        -> IO r
-getRef name mapRef = do
+getRef name new mapRef = do
     empty <- new
     ref <- atomicModifyIORef mapRef $ \ m ->
         case M.lookup name m of
