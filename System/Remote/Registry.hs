@@ -10,6 +10,7 @@ module System.Remote.Registry
     , getGauge
     , getLabel
     , newPullGauge
+    , getPullGauge
     , hasCounter
     , hasGauge
     , hasLabel
@@ -33,6 +34,7 @@ import qualified System.Remote.PullGauge.Internal as P
 import System.Remote.Registry.Internal
 import qualified Data.Text as T
 import qualified Data.HashMap.Strict as M
+import Data.Functor
 import Data.IORef (IORef, readIORef)
 
 -- | Return the counter associated with the given name and registry.
@@ -68,10 +70,15 @@ getLabel name registry = getRef name L.new (userLabels registry)
 -- the same pullGauge.  The first time 'getPullGauge' is called for a given
 -- name and registry, a new, empty pullGauge will be returned.
 newPullGauge :: T.Text -- ^ PullGauge name
-		 -> Registry -- ^ Registry that contains the pullGauge
-         -> IO Int
-		 -> IO PullGauge
+		     -> Registry -- ^ Registry for which to create the pullGauge
+             -> IO Int
+		     -> IO PullGauge
 newPullGauge name registry value = getRef name (return $ P.new value) (userPullGauges registry)
+
+getPullGauge :: T.Text -- ^ PullGauge name
+             -> Registry -- ^ The registry that contains the pullGauge
+             -> IO (Maybe PullGauge)
+getPullGauge name registry = M.lookup name <$> readIORef (userPullGauges registry)
 
 hasCounter :: T.Text -- ^ Counter name
            -> Registry
