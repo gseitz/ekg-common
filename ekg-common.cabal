@@ -24,8 +24,17 @@ library
                        System.Remote.GHC
                        System.Remote.Ekg
                        System.Remote.Registry
+                       System.Remote.Stats.Atomic
+                       System.Remote.Stats.EWMA
+                       System.Remote.Stats.Samples.UniformSample
+                       System.Remote.Stats.Samples.ExpDecayingSample
+                       System.Remote.Stats.Sample
+                       System.Remote.Stats.Snapshot
+                       System.Remote.Stats.Histogram
+                       System.Remote.Stats.Meter
 
-  other-modules:       System.Remote.Counter.Internal
+  other-modules:       Paths_ekg_common
+                       System.Remote.Counter.Internal
                        System.Remote.Gauge.Internal
                        System.Remote.Label.Internal
                        System.Remote.PullGauge.Internal
@@ -38,7 +47,12 @@ library
                        text < 0.12,
                        time < 1.5,
                        transformers < 0.4,
-                       unordered-containers < 0.3
+                       unordered-containers < 0.3,
+                       time-units >= 1.0.0,
+                       hashmap >= 1.3,
+                       array >= 0.4,
+                       random >= 1.0,
+                       vector >= 0.10
   ghc-options:         -Wall
 
 source-repository head
