@@ -9,7 +9,7 @@ module System.Remote.Stats.Meter
 
 import Control.Monad (when, forM_)
 import Data.Int (Int64)
-import Data.IORef (IORef, readIORef, atomicModifyIORef')
+import Data.IORef (IORef, readIORef, atomicModifyIORef)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 
 
@@ -44,7 +44,7 @@ mark1 m = mark m 1
 mark :: Meter -> Int64 -> IO ()
 mark m@(Meter m1 m5 m15 countR _ _) n = do
     tickIfNecessary m
-    atomicModifyIORef' countR $ \c -> (c+n, ())
+    atomicModifyIORef countR $ \c -> (c+n, ())
     E.update m1 n
     E.update m5 n
     E.update m15 n

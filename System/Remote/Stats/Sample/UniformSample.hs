@@ -9,9 +9,10 @@ import Control.Monad (forM_, when)
 import Data.Array.MArray
 import Data.Array.IO (IOArray)
 import Data.Int
-import Data.IORef (IORef, newIORef, readIORef, atomicWriteIORef, atomicModifyIORef')
+import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 import System.Random
 
+import System.Remote.Stats.Atomic (atomicWriteIORef)
 import qualified System.Remote.Stats.Sample as S
 import System.Remote.Stats.Snapshot (newSnapshot)
 
@@ -27,7 +28,7 @@ instance S.Sample UniformSample where
         return $ min (fromIntegral c) hi
 
     update (UniformSample values count) value = do
-        c      <- atomicModifyIORef' count $ \n -> (n+1, n+1)    
+        c      <- atomicModifyIORef count $ \n -> (n+1, n+1)    
         (_,hi) <- getBounds values
         when (c-1 <= fromIntegral hi) $
             writeArray values (fromIntegral (c-1)) value

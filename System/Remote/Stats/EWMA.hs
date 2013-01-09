@@ -9,10 +9,12 @@ module System.Remote.Stats.EWMA
     , rate
 	) where
 
-import Data.Time.Units
-import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef', atomicWriteIORef)
 import Control.Monad (when)
 import Data.Int (Int64)
+import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
+import Data.Time.Units
+
+import System.Remote.Stats.Atomic (atomicWriteIORef)
 
 data EWMA = EWMA
     !(IORef Double)  -- ^ rate
@@ -44,10 +46,10 @@ mkAlpha interval minutes = 1.0 - exp (-interval / seconds_per_minute / minutes)
 
 newEWMA :: Double -> Microsecond -> IO EWMA
 newEWMA alpha ival = do
-    rate        <- newIORef 0.0
+    rate'       <- newIORef 0.0
     uncounted   <- newIORef 0
     initialized <- newIORef False
-    return $ EWMA rate alpha asMicros uncounted initialized
+    return $ EWMA rate' alpha asMicros uncounted initialized
   where
     asMicros = convertUnit ival
                          
@@ -63,13 +65,13 @@ fifteenMinuteEWMA = newEWMA m15_alpha $ fromMicroseconds default_interval_us
 
 update :: EWMA -> Int64 -> IO ()
 update (EWMA _ _ _ unc _) n = do
-    atomicModifyIORef' unc (\c -> ((c+n),()))
+    atomicModifyIORef unc (\c -> ((c+n),()))
 
 tick :: EWMA -> IO ()
 tick (EWMA rateR alpha interval uncountedR initR) = do
     wasInitialized <- readIORef initR
     uncounted     <- readIORef uncountedR
-    atomicModifyIORef' rateR (\r -> (calcRate r uncounted wasInitialized, ()))
+    atomicModifyIORef rateR (\r -> (calcRate r uncounted wasInitialized, ()))
     when (not wasInitialized) $ atomicWriteIORef initR True
   where
     calcRate :: Double -> Int64 -> Bool -> Double
@@ -84,5 +86,5 @@ tick (EWMA rateR alpha interval uncountedR initR) = do
 
 rate :: TimeUnit t => EWMA -> t -> IO Double
 rate (EWMA rateR _ _ _ _) unit = do
-    rate <- readIORef rateR
-    return $ rate * (fromIntegral $ toMicroseconds unit)
+    r <- readIORef rateR
+    return $ r * (fromIntegral $ toMicroseconds unit)

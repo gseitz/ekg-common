@@ -14,11 +14,11 @@ module System.Remote.Stats.Histogram
     , hStdDev
     ) where
 
-import Data.Int (Int64)
-import Data.IORef (IORef, newIORef, readIORef, atomicWriteIORef,
-                   atomicModifyIORef')
 import Control.Monad (when)
+import Data.Int (Int64)
+import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 
+import System.Remote.Stats.Atomic (atomicWriteIORef)
 import System.Remote.Stats.Sample.UniformSample
 import System.Remote.Stats.Snapshot (Snapshot)
 import qualified System.Remote.Stats.Sample as S
@@ -60,8 +60,8 @@ update h@(Histogram sample minR maxR sumR countR _) value = do
     S.update sample value
     setMin minR value
     setMax maxR value
-    atomicModifyIORef' sumR $ \s -> (s+value, ())
-    atomicModifyIORef' countR $ \x -> (x+1, ())
+    atomicModifyIORef sumR $ \s -> (s+value, ())
+    atomicModifyIORef countR $ \x -> (x+1, ())
     updateVariance h value
 
 
@@ -75,7 +75,7 @@ updateVariance h@(Histogram _ _ _ _ _ varR) value = do
              in do
                  c <- hCount h
                  return $ (newM $ fromIntegral c, newS $ fromIntegral c)
-    succeeded <- atomicModifyIORef' varR  $ \t@(m, s) ->
+    succeeded <- atomicModifyIORef varR  $ \t@(m, s) ->
         if t == old
             then (new, True)
             else (t, False)
@@ -136,7 +136,7 @@ setMin ref val = set ref (>) val
 set :: IORef Int64 -> (Int64 -> Int64 -> Bool) -> Int64 -> IO ()
 set ref p val = do
     s <- readIORef ref
-    when (p s val) $ atomicModifyIORef' ref $ \x -> (newX x, ())
+    when (p s val) $ atomicModifyIORef ref $ \x -> (newX x, ())
   where
     newX x = if p x val then val else x
 
