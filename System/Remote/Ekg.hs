@@ -178,14 +178,17 @@ data Stats = Stats {
   }
 
 instance A.ToJSON Stats where
-    toJSON (Stats counters gauges labels pullGauges _) =
-        A.object $      
-        convert counters ++
-        convert gauges ++
-        convert labels ++
-        convert pullGauges
-        where convert = map (uncurry (.=))
+    toJSON (Stats counters gauges labels pullGauges t) = A.object $ 
+        [ "server_timestamp_millis"  .= t
+        , "counters"                 .= Assocs counters
+        , "gauges"                   .= Assocs gauges
+        , "labels"                   .= Assocs labels
+        , "pull_gauges"              .= Assocs pullGauges
+        ]
 
+newtype Assocs = Assocs [(T.Text, Json)]
+instance A.ToJSON Assocs where
+    toJSON (Assocs xs) = A.object $ map (uncurry (.=)) xs
 
 readAllRefs :: (Ref r t, A.ToJSON t) => IORef (M.HashMap T.Text r)
             -> IO [(T.Text, Json)]
