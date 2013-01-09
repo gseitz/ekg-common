@@ -23,6 +23,11 @@ module System.Remote.Registry
     , Ref
     ) where
 
+import Data.Functor
+import qualified Data.HashMap.Strict as M
+import Data.IORef (IORef, readIORef)
+import qualified Data.Text as T
+
 import System.Remote.Gauge
 import qualified System.Remote.Gauge.Internal as G
 import System.Remote.Counter
@@ -32,10 +37,6 @@ import qualified System.Remote.Label.Internal as L
 import System.Remote.PullGauge
 import qualified System.Remote.PullGauge.Internal as P
 import System.Remote.Registry.Internal
-import qualified Data.Text as T
-import qualified Data.HashMap.Strict as M
-import Data.Functor
-import Data.IORef (IORef, readIORef)
 
 -- | Return the counter associated with the given name and registry.
 -- Multiple calls to 'getCounter' with the same arguments will return

@@ -26,8 +26,8 @@ library
                        System.Remote.Registry
                        System.Remote.Stats.Atomic
                        System.Remote.Stats.EWMA
-                       System.Remote.Stats.Samples.UniformSample
-                       System.Remote.Stats.Samples.ExpDecayingSample
+                       System.Remote.Stats.Sample.UniformSample
+                       System.Remote.Stats.Sample.ExpDecayingSample
                        System.Remote.Stats.Sample
                        System.Remote.Stats.Snapshot
                        System.Remote.Stats.Histogram

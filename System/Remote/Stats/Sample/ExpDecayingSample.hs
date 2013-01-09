@@ -1,4 +1,4 @@
-module System.Remote.Stats.Samples.ExpDecayingSample
+module System.Remote.Stats.Sample.ExpDecayingSample
 	(
 
 	) where

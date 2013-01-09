@@ -7,21 +7,24 @@ module System.Remote.Stats.Meter
 	) where
 
 
+import Control.Monad (when, forM_)
+import Data.Int (Int64)
+import Data.IORef (IORef, readIORef, atomicModifyIORef')
+import Data.Time.Clock.POSIX (getPOSIXTime)
+
+
+
+import System.Remote.Stats.Atomic
 import System.Remote.Stats.EWMA (EWMA)
 import qualified System.Remote.Stats.EWMA as E
-import Data.Int (Int64)
-import Data.Time.Clock.POSIX (getPOSIXTime)
-import Data.Time.Units
-import Data.IORef
-import System.Remote.Stats.Atomic
-import Control.Monad (when, forM_)
 
-data Meter = Meter EWMA -- ^  1min rate
-                   EWMA -- ^  5min rate
-                   EWMA -- ^ 15min rate
-                  (IORef Int64) -- ^ count
-                   Double -- ^ start time
-                  (IORef Double) -- ^ last tick
+data Meter = Meter
+    !EWMA            -- ^  1min rate
+    !EWMA            -- ^  5min rate
+    !EWMA            -- ^ 15min rate
+    !(IORef Int64)   -- ^ count
+    !Double          -- ^ start time
+    !(IORef Double)  -- ^ last tick
 
 
 tick_interval :: Int
@@ -41,7 +44,7 @@ mark1 m = mark m 1
 mark :: Meter -> Int64 -> IO ()
 mark m@(Meter m1 m5 m15 countR _ _) n = do
     tickIfNecessary m
-    atomicModifyIORef' countR (\c -> (c+n, ()))
+    atomicModifyIORef' countR $ \c -> (c+n, ())
     E.update m1 n
     E.update m5 n
     E.update m15 n
@@ -55,7 +58,7 @@ tickIfNecessary m@(Meter _ _ _ _ _ lastR) = do
     when (age > tick_interval) $ do
         wasSet <- compareAndSet lastR oldTick newTick
         requiredTicks <- return $ div age tick_interval
-        forM_ [1..requiredTicks] (\_ -> tick m)
+        forM_ [1..requiredTicks] $ \_ -> tick m
 
 
 count :: Meter -> IO Int64

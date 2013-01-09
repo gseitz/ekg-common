@@ -5,6 +5,7 @@ module System.Remote.Stats.Sample
 
 
 import Data.Int
+
 import System.Remote.Stats.Snapshot (Snapshot)
 
 class Sample s where
