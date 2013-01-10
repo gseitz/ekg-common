@@ -12,22 +12,22 @@ module System.Remote.Stats.EWMA
 import Control.Monad (when)
 import Data.Int (Int64)
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
-import Data.Time.Units
 
 import System.Remote.Stats.Atomic (atomicWriteIORef)
+import System.Remote.Stats.Time
 
 data EWMA = EWMA
     !(IORef Double)  -- ^ rate
     !Double          -- ^ alpha
-    !Microsecond     -- ^ interval
+    !Integer         -- ^ interval
     !(IORef Int64)   -- ^ uncounted
     !(IORef Bool)    -- ^ initialized
 
 default_interval :: Double
 default_interval = 5.0
 
-default_interval_us :: Integer
-default_interval_us = (ceiling default_interval) * 1000000
+default_interval_ns :: Integer
+default_interval_ns = toNanos Second (ceiling default_interval)
 
 seconds_per_minute :: Double
 seconds_per_minute = 60.0
@@ -44,24 +44,21 @@ m15_alpha = mkAlpha default_interval 15.0
 mkAlpha :: Double -> Double -> Double
 mkAlpha interval minutes = 1.0 - exp (-interval / seconds_per_minute / minutes)
 
-newEWMA :: Double -> Microsecond -> IO EWMA
+newEWMA :: Double -> Integer -> IO EWMA
 newEWMA alpha ival = do
     rate'       <- newIORef 0.0
     uncounted   <- newIORef 0
     initialized <- newIORef False
-    return $ EWMA rate' alpha asMicros uncounted initialized
-  where
-    asMicros = convertUnit ival
-                         
+    return $ EWMA rate' alpha ival uncounted initialized
 
 oneMinuteEWMA :: IO EWMA
-oneMinuteEWMA = newEWMA m1_alpha $ fromMicroseconds default_interval_us
+oneMinuteEWMA = newEWMA m1_alpha default_interval_ns
 
 fiveMinuteEWMA :: IO EWMA
-fiveMinuteEWMA = newEWMA m5_alpha $ fromMicroseconds default_interval_us
+fiveMinuteEWMA = newEWMA m5_alpha default_interval_ns
 
 fifteenMinuteEWMA :: IO EWMA
-fifteenMinuteEWMA = newEWMA m15_alpha $ fromMicroseconds default_interval_us
+fifteenMinuteEWMA = newEWMA m15_alpha default_interval_ns
 
 update :: EWMA -> Int64 -> IO ()
 update (EWMA _ _ _ unc _) n = do
@@ -76,15 +73,14 @@ tick (EWMA rateR alpha interval uncountedR initR) = do
   where
     calcRate :: Double -> Int64 -> Bool -> Double
     calcRate r uncounted wasInit =
-        let instantRate = (fromIntegral uncounted) / ival
-            ival = (fromIntegral $ toMicroseconds interval)
+        let instantRate = (fromIntegral uncounted) / (fromIntegral interval)
         in
             if wasInit
             then r + alpha * (instantRate - r)
             else instantRate
-        
 
-rate :: TimeUnit t => EWMA -> t -> IO Double
+
+rate :: EWMA -> TimeUnit -> IO Double
 rate (EWMA rateR _ _ _ _) unit = do
     r <- readIORef rateR
-    return $ r * (fromIntegral $ toMicroseconds unit)
+    return $ r * (fromIntegral $ toNanos unit 1)

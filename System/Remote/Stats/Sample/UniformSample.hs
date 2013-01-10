@@ -30,10 +30,11 @@ instance S.Sample UniformSample where
     update (UniformSample values count) value = do
         c      <- atomicModifyIORef count $ \n -> (n+1, n+1)    
         (_,hi) <- getBounds values
-        when (c-1 <= fromIntegral hi) $
-            writeArray values (fromIntegral (c-1)) value
-        r <- nextInt $ fromIntegral c
-        when (c   >= fromIntegral hi && r <= hi) $ writeArray values r value
+        if (c-1 <= fromIntegral hi)
+            then writeArray values (fromIntegral (c-1)) value
+            else do
+                r <- nextInt $ fromIntegral c
+                when (r <= hi) $ writeArray values r value
 
     snapshot sample @ (UniformSample values _) = do
         c  <- S.size sample

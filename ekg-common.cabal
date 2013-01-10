@@ -32,6 +32,7 @@ library
                        System.Remote.Stats.Snapshot
                        System.Remote.Stats.Histogram
                        System.Remote.Stats.Meter
+                       System.Remote.Stats.Time
 
   other-modules:       Paths_ekg_common
                        System.Remote.Counter.Internal
