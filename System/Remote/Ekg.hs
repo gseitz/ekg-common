@@ -142,7 +142,7 @@ import System.Remote.GHC
 -- (e.g. the current number of concurrent connections.) A label is a
 -- free-form string value (e.g. exporting the command line arguments
 -- or host name.) A pullGauge is a variable value that is updated automatically
--- each time it is observed (e.g. 'IO Int' for looking up the size of a 
+-- each time it is observed (e.g. 'IO Int' for looking up the size of a
 -- 'Data.Map' inside an 'IORef'). Each counter, gauge, pullGauge and label is
 -- associated with a name, which is used when it is displayed in the UI
 -- or returned in a JSON object.
@@ -178,7 +178,7 @@ data Stats = Stats {
   }
 
 instance A.ToJSON Stats where
-    toJSON (Stats counters gauges labels pullGauges t) = A.object $ 
+    toJSON (Stats counters gauges labels pullGauges t) = A.object $
         [ "server_timestamp_millis"  .= t
         , "counters"                 .= Assocs counters
         , "gauges"                   .= Assocs gauges
@@ -210,7 +210,7 @@ takeSnapshot reg = do
     pullGauges   <- readAllRefs $ Registry.userPullGauges reg
     time     <- getTimeMillis
     return $ Stats counters gauges labels pullGauges time
-    
+
 
 -- Existential wrapper used for OO-style polymorphism.
 data Json = forall a. A.ToJSON a => Json a
