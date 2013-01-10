@@ -67,9 +67,9 @@ update (EWMA _ _ _ unc _) n = do
 tick :: EWMA -> IO ()
 tick (EWMA rateR alpha interval uncountedR initR) = do
     wasInitialized <- readIORef initR
-    uncounted     <- readIORef uncountedR
-    atomicModifyIORef rateR (\r -> (calcRate r uncounted wasInitialized, ()))
-    when (not wasInitialized) $ atomicWriteIORef initR True
+    uncounted <- atomicModifyIORef uncountedR $ \unc -> (0, unc)
+    atomicModifyIORef rateR $ \r -> (calcRate r uncounted wasInitialized,())
+    when (not wasInitialized) $ do atomicWriteIORef initR True
   where
     calcRate :: Double -> Int64 -> Bool -> Double
     calcRate r uncounted wasInit =
