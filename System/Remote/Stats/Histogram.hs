@@ -1,3 +1,4 @@
+{-# LANGUAGE ExistentialQuantification #-}
 module System.Remote.Stats.Histogram
     (
       Histogram
@@ -24,13 +25,13 @@ import System.Remote.Stats.Snapshot (Snapshot)
 import qualified System.Remote.Stats.Sample as S
 
 
-data Histogram = Histogram
-    !UniformSample             -- ^ sample
-    !(IORef Int64)             -- ^ min
-    !(IORef Int64)             -- ^ max
-    !(IORef Int64)             -- ^ sum
-    !(IORef Int64)             -- ^ count
-    !(IORef (Double, Double))  -- ^ variance
+data Histogram = forall a. S.Sample a => Histogram
+    a                         -- ^ sample
+    (IORef Int64)             -- ^ min
+    (IORef Int64)             -- ^ max
+    (IORef Int64)             -- ^ sum
+    (IORef Int64)             -- ^ count
+    (IORef (Double, Double))  -- ^ variance
 
 
 default_sample_size :: Int
@@ -75,7 +76,7 @@ updateVariance h@(Histogram _ _ _ _ _ varR) value = do
              in do
                  c <- hCount h
                  return $ (newM $ fromIntegral c, newS $ fromIntegral c)
-    succeeded <- atomicModifyIORef varR  $ \t@(m, s) ->
+    succeeded <- atomicModifyIORef varR  $ \t ->
         if t == old
             then (new, True)
             else (t, False)
