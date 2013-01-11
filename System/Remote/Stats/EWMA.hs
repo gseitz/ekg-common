@@ -1,4 +1,4 @@
-module System.Remote.Stats.EWMA 
+module System.Remote.Stats.EWMA
 	(
       EWMA (..)
     , oneMinuteEWMA
@@ -9,7 +9,7 @@ module System.Remote.Stats.EWMA
     , rate
 	) where
 
-import Control.Monad (when)
+import Control.Monad (unless)
 import Data.Int (Int64)
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 
@@ -23,26 +23,26 @@ data EWMA = EWMA
     !(IORef Int64)   -- ^ uncounted
     !(IORef Bool)    -- ^ initialized
 
-default_interval :: Double
-default_interval = 5.0
+defaultInterval :: Double
+defaultInterval = 5.0
 
-default_interval_ns :: Integer
-default_interval_ns = toNanos Second (ceiling default_interval)
+defaultIntervalNs :: Integer
+defaultIntervalNs = toNanos Second (ceiling defaultInterval)
 
-seconds_per_minute :: Double
-seconds_per_minute = 60.0
+secondsPerMinute :: Double
+secondsPerMinute = 60.0
 
-m1_alpha :: Double
-m1_alpha  = mkAlpha default_interval 1.0
+m1Alpha :: Double
+m1Alpha  = mkAlpha defaultInterval 1.0
 
-m5_alpha :: Double
-m5_alpha  = mkAlpha default_interval 5.0
+m5Alpha :: Double
+m5Alpha  = mkAlpha defaultInterval 5.0
 
-m15_alpha :: Double
-m15_alpha = mkAlpha default_interval 15.0
+m15Alpha :: Double
+m15Alpha = mkAlpha defaultInterval 15.0
 
 mkAlpha :: Double -> Double -> Double
-mkAlpha interval minutes = 1.0 - exp (-interval / seconds_per_minute / minutes)
+mkAlpha interval minutes = 1.0 - exp (-interval / secondsPerMinute / minutes)
 
 newEWMA :: Double -> Integer -> IO EWMA
 newEWMA alpha ival = do
@@ -52,28 +52,27 @@ newEWMA alpha ival = do
     return $ EWMA rate' alpha ival uncounted initialized
 
 oneMinuteEWMA :: IO EWMA
-oneMinuteEWMA = newEWMA m1_alpha default_interval_ns
+oneMinuteEWMA = newEWMA m1Alpha defaultIntervalNs
 
 fiveMinuteEWMA :: IO EWMA
-fiveMinuteEWMA = newEWMA m5_alpha default_interval_ns
+fiveMinuteEWMA = newEWMA m5Alpha defaultIntervalNs
 
 fifteenMinuteEWMA :: IO EWMA
-fifteenMinuteEWMA = newEWMA m15_alpha default_interval_ns
+fifteenMinuteEWMA = newEWMA m15Alpha defaultIntervalNs
 
 update :: EWMA -> Int64 -> IO ()
-update (EWMA _ _ _ unc _) n = do
-    atomicModifyIORef unc (\c -> ((c+n),()))
+update (EWMA _ _ _ unc _) n = atomicModifyIORef unc $ \c -> (c+n,())
 
 tick :: EWMA -> IO ()
 tick (EWMA rateR alpha interval uncountedR initR) = do
     wasInitialized <- readIORef initR
     uncounted <- atomicModifyIORef uncountedR $ \unc -> (0, unc)
     atomicModifyIORef rateR $ \r -> (calcRate r uncounted wasInitialized,())
-    when (not wasInitialized) $ do atomicWriteIORef initR True
+    unless wasInitialized $ atomicWriteIORef initR True
   where
     calcRate :: Double -> Int64 -> Bool -> Double
     calcRate r uncounted wasInit =
-        let instantRate = (fromIntegral uncounted) / (fromIntegral interval)
+        let instantRate = fromIntegral uncounted / fromIntegral interval
         in
             if wasInit
             then r + alpha * (instantRate - r)
@@ -83,4 +82,4 @@ tick (EWMA rateR alpha interval uncountedR initR) = do
 rate :: EWMA -> TimeUnit -> IO Double
 rate (EWMA rateR _ _ _ _) unit = do
     r <- readIORef rateR
-    return $ r * (fromIntegral $ toNanos unit 1)
+    return $ r * fromIntegral (toNanos unit 1)
