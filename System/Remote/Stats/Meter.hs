@@ -2,12 +2,13 @@ module System.Remote.Stats.Meter
 	(
       Meter
     , newMeter
-    , mark
-    , mark1
+    , inc
+    , add
     , count
     , oneMinuteRate
     , fiveMinuteRate
     , fifteenMinuteRate
+    , timeUnit
 	) where
 
 
@@ -46,14 +47,14 @@ newMeter unit = do
     return $ Meter m1 m5 m15 c time lastTick unit
 
 -- | Records the occurrence of a single event.
-mark1 :: Meter -> IO ()
-mark1 m = mark m 1
+inc :: Meter -> IO ()
+inc m = add m 1
 
 -- | Records the occurrence of a number of events.
-mark :: Meter
-     -> Int64  -- ^ The number of events that occurred
-     -> IO ()
-mark m@(Meter m1 m5 m15 countR _ _ _) n = do
+add :: Meter
+    -> Int64  -- ^ The number of events that occurred
+    -> IO ()
+add m@(Meter m1 m5 m15 countR _ _ _) n = do
     tickIfNecessary m
     atomicModifyIORef countR $ \c -> (c+n, ())
     E.update m1 n
@@ -62,8 +63,7 @@ mark m@(Meter m1 m5 m15 countR _ _ _) n = do
 
 -- | Gets the number of recorded events so far.
 count :: Meter -> IO Int64
-count (Meter _ _ _ countR _ _ _) = do
-    readIORef countR
+count (Meter _ _ _ countR _ _ _) = readIORef countR
 
 -- | Gets the 1 minute rate of the provided @Meter@.
 oneMinuteRate :: Meter -> IO Double
@@ -77,12 +77,15 @@ fiveMinuteRate (Meter _ m5 _ _ _ _ unit) = rate m5 unit
 fifteenMinuteRate :: Meter -> IO Double
 fifteenMinuteRate (Meter _ _ m15 _ _ _ unit) = rate m15 unit
 
+-- | Gets the time unit used for the load averages.
+timeUnit :: Meter -> TimeUnit
+timeUnit (Meter _ _ _ _ _ _ unit) = unit
 
 getTimeMillis :: IO Double
 getTimeMillis = (realToFrac . (* 1000)) `fmap` getPOSIXTime
 
-tick_interval :: Int
-tick_interval = 5000
+tickInterval :: Int
+tickInterval = 5000
 
 tick :: Meter -> IO ()
 tick (Meter m1 m5 m15 _ _ _ _) = do
@@ -94,9 +97,9 @@ tickIfNecessary :: Meter -> IO ()
 tickIfNecessary m@(Meter _ _ _ _ _ lastR _) = do
     oldTick <- readIORef lastR
     newTick <- getTimeMillis
-    age <- return $ floor $ newTick - oldTick
-    when (age > tick_interval) $ do
+    let age = floor $ newTick - oldTick
+    when (age > tickInterval) $ do
         wasSet <- compareAndSet lastR oldTick newTick
         when wasSet $
-            let requiredTicks = age `div` tick_interval
-            in do forM_ [1..requiredTicks] $ \_ -> tick m
+            let requiredTicks = age `div` tickInterval
+            in forM_ [1..requiredTicks] $ \_ -> tick m
