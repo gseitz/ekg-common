@@ -17,8 +17,8 @@ module System.Remote.Gauge
 import Data.IORef (atomicModifyIORef)
 import Prelude hiding (subtract)
 
-import System.Remote.Gauge.Internal
-import System.Remote.Stats.Atomic (atomicWriteIORef)
+import Data.Atomic (atomicWriteIORef)
+import Data.Ekg.Gauge.Internal
 
 -- | Increase the gauge by one.
 inc :: Gauge -> IO ()

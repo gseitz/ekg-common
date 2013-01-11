@@ -1,4 +1,4 @@
-module System.Remote.Stats.Snapshot
+module Data.Ekg.Histogram.Snapshot
 	(
       Snapshot
     , newSnapshot

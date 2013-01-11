@@ -1,4 +1,4 @@
-module System.Remote.Stats.Time
+module Data.Time
 	(
       TimeUnit(..)
     , toNanos

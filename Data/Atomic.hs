@@ -1,4 +1,4 @@
-module System.Remote.Stats.Atomic
+module Data.Atomic
 	(
       atomicWriteIORef
     , compareAndSet

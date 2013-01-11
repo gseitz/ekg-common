@@ -7,7 +7,7 @@ module System.Remote.GHC
 
 import qualified GHC.Stats as Stats
 
-import System.Remote.Registry
+import Data.Ekg.Registry
 
 emptyGCStats :: Stats.GCStats
 emptyGCStats = Stats.GCStats

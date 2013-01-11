@@ -36,8 +36,8 @@ import qualified Data.Text as T
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import Prelude hiding (read)
 
-import System.Remote.Registry
-import qualified System.Remote.Registry.Internal as Registry
+import Data.Ekg.Registry
+import qualified Data.Ekg.Registry.Internal as Registry
 import System.Remote.GHC
 
 -- $configuration

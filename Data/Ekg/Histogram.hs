@@ -1,5 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
-module System.Remote.Stats.Histogram
+module Data.Ekg.Histogram
     (
       Histogram
     , newUniformHistogram
@@ -19,10 +19,10 @@ import Control.Monad (when, unless)
 import Data.Int (Int64)
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 
-import System.Remote.Stats.Atomic (atomicWriteIORef)
-import System.Remote.Stats.Sample.UniformSample
-import System.Remote.Stats.Snapshot (Snapshot)
-import qualified System.Remote.Stats.Sample as S
+import Data.Atomic (atomicWriteIORef)
+import Data.Ekg.Histogram.UniformSample
+import Data.Ekg.Histogram.Snapshot (Snapshot)
+import qualified Data.Ekg.Histogram.Sample as S
 
 
 data Histogram = forall a. S.Sample a => Histogram

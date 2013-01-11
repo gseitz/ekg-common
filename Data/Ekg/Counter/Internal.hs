@@ -1,5 +1,5 @@
 {-# OPTIONS_HADDOCK not-home #-}
-module System.Remote.Counter.Internal
+module Data.Ekg.Counter.Internal
     (
       Counter(..)
     , new

@@ -1,4 +1,4 @@
-module System.Remote.Stats.Sample
+module Data.Ekg.Histogram.Sample
     (
       Sample(..)
     ) where
@@ -6,7 +6,7 @@ module System.Remote.Stats.Sample
 
 import Data.Int (Int64)
 
-import System.Remote.Stats.Snapshot (Snapshot)
+import Data.Ekg.Histogram.Snapshot (Snapshot)
 
 class Sample s where
     -- | Gets the current number of values used in the @Sample@.

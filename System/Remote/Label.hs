@@ -13,8 +13,8 @@ module System.Remote.Label
 import Data.IORef (atomicModifyIORef)
 import qualified Data.Text as T
 
-import System.Remote.Label.Internal
-import System.Remote.Stats.Atomic (atomicWriteIORef)
+import Data.Atomic (atomicWriteIORef)
+import Data.Ekg.Label.Internal
 
 -- | Set the label to the given value.
 set :: Label -> T.Text -> IO ()

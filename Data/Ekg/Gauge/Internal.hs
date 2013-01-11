@@ -1,5 +1,5 @@
 {-# OPTIONS_HADDOCK not-home #-}
-module System.Remote.Gauge.Internal
+module Data.Ekg.Gauge.Internal
     (
       Gauge(..)
     , new

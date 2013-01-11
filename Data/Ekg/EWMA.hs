@@ -1,4 +1,4 @@
-module System.Remote.Stats.EWMA
+module Data.Ekg.EWMA
 	(
       EWMA (..)
     , oneMinuteEWMA
@@ -13,8 +13,8 @@ import Control.Monad (unless)
 import Data.Int (Int64)
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 
-import System.Remote.Stats.Atomic (atomicWriteIORef)
-import System.Remote.Stats.Time
+import Data.Atomic (atomicWriteIORef)
+import Data.Time
 
 data EWMA = EWMA
     !(IORef Double)  -- ^ rate

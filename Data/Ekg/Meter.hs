@@ -1,4 +1,4 @@
-module System.Remote.Stats.Meter
+module Data.Ekg.Meter
 	(
       Meter
     , newMeter
@@ -17,11 +17,11 @@ import Data.Int (Int64)
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 
-import System.Remote.Stats.Atomic
-import System.Remote.Stats.EWMA (EWMA, rate, oneMinuteEWMA, fiveMinuteEWMA,
+import Data.Atomic
+import Data.Ekg.EWMA (EWMA, rate, oneMinuteEWMA, fiveMinuteEWMA,
                                  fifteenMinuteEWMA)
-import qualified System.Remote.Stats.EWMA as E
-import System.Remote.Stats.Time (TimeUnit)
+import qualified Data.Ekg.EWMA as E
+import Data.Time (TimeUnit)
 
 -- | A @Meter@ records the number of events that happen and keeps an
 -- exponentially-weighted moving average for the 1/5/15 minute rates similar

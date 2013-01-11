@@ -1,4 +1,4 @@
-module System.Remote.Stats.Sample.UniformSample
+module Data.Ekg.Histogram.UniformSample
 	(
       UniformSample
     , newUniformSample
@@ -12,25 +12,25 @@ import Data.Int
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 import System.Random
 
-import System.Remote.Stats.Atomic (atomicWriteIORef)
-import qualified System.Remote.Stats.Sample as S
-import System.Remote.Stats.Snapshot (newSnapshot)
+import Data.Atomic (atomicWriteIORef)
+import qualified Data.Ekg.Histogram.Sample as S
+import Data.Ekg.Histogram.Snapshot (newSnapshot)
 
 
-data UniformSample = UniformSample 
+data UniformSample = UniformSample
     !(IOArray Int Int64)  -- ^ values
     !(IORef Int64)        -- ^ count
 
-instance S.Sample UniformSample where 
+instance S.Sample UniformSample where
     size (UniformSample values count) = do
         c  <- readIORef count
         (_,hi) <- getBounds values
         return $ min (fromIntegral c) hi
 
     update (UniformSample values count) value = do
-        c      <- atomicModifyIORef count $ \n -> (n+1, n+1)    
+        c      <- atomicModifyIORef count $ \n -> (n+1, n+1)
         (_,hi) <- getBounds values
-        if (c-1 <= fromIntegral hi)
+        if c-1 <= fromIntegral hi
             then writeArray values (fromIntegral (c-1)) value
             else do
                 r <- nextInt $ fromIntegral c

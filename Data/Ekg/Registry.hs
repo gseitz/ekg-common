@@ -2,7 +2,7 @@
 -- Counters are non-negative, monotonically increasing values and can
 -- be used to track e.g. the number of requests served since program
 -- start.  All operations on counters are thread-safe.
-module System.Remote.Registry
+module Data.Ekg.Registry
     (
       Registry
     , getCounter
@@ -28,14 +28,14 @@ import Data.IORef (IORef, readIORef)
 import qualified Data.Text as T
 
 import System.Remote.Gauge
-import qualified System.Remote.Gauge.Internal as G
+import qualified Data.Ekg.Gauge.Internal as G
 import System.Remote.Counter
-import qualified System.Remote.Counter.Internal as C
+import qualified Data.Ekg.Counter.Internal as C
 import System.Remote.Label
-import qualified System.Remote.Label.Internal as L
+import qualified Data.Ekg.Label.Internal as L
 import System.Remote.PullGauge
-import qualified System.Remote.PullGauge.Internal as P
-import System.Remote.Registry.Internal
+import qualified Data.Ekg.PullGauge.Internal as P
+import Data.Ekg.Registry.Internal
 
 -- | Return the counter associated with the given name and registry.
 -- Multiple calls to 'getCounter' with the same arguments will return

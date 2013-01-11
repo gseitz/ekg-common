@@ -7,4 +7,4 @@ module System.Remote.PullGauge
       PullGauge
     ) where
 
-import System.Remote.PullGauge.Internal
+import Data.Ekg.PullGauge.Internal

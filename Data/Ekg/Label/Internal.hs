@@ -1,5 +1,5 @@
 {-# OPTIONS_HADDOCK not-home #-}
-module System.Remote.Label.Internal
+module Data.Ekg.Label.Internal
     (
       Label(..)
     , new

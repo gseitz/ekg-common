@@ -11,9 +11,9 @@ import qualified System.Remote.Counter as Counter
 import qualified System.Remote.Label as Label
 import System.Remote.Ekg
 import Data.Aeson
-import System.Remote.Stats.Histogram
-import System.Remote.Stats.Meter
-import System.Remote.Stats.Time
+import Data.Ekg.Histogram
+import Data.Ekg.Meter
+import Data.Time
 
 import System.Posix.Unistd
 
@@ -28,7 +28,7 @@ mean xs = sum xs / fromIntegral (length xs)
 runMeter :: IO ()
 runMeter = do
     meter <- newMeter Second
-    mark meter 30
+    add meter 30
     forkIO $ forever $ do
         c <- count meter
         m1 <- oneMinuteRate meter
@@ -38,7 +38,7 @@ runMeter = do
         sleep 2
 
     forkIO $ forever $ do
-        mark meter 5
+        add meter 5
         sleep 1
 
     return ()

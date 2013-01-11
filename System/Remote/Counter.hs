@@ -13,7 +13,7 @@ module System.Remote.Counter
 import Data.IORef (atomicModifyIORef)
 import Prelude hiding (subtract)
 
-import System.Remote.Counter.Internal
+import Data.Ekg.Counter.Internal
 
 -- | Increase the counter by one.
 inc :: Counter -> IO ()

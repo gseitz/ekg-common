@@ -1,6 +1,6 @@
 {-# OPTIONS_HADDOCK not-home #-}
 {-# LANGUAGE FunctionalDependencies, OverloadedStrings #-}
-module System.Remote.Registry.Internal
+module Data.Ekg.Registry.Internal
     (
       Registry(..)
     , Ref(..)
@@ -12,10 +12,10 @@ import System.Remote.Gauge
 import System.Remote.Counter
 import System.Remote.Label
 import System.Remote.PullGauge
-import qualified System.Remote.Gauge.Internal as Gauge
-import qualified System.Remote.Counter.Internal as Counter
-import qualified System.Remote.Label.Internal as Label
-import qualified System.Remote.PullGauge.Internal as PullGauge
+import qualified Data.Ekg.Gauge.Internal as Gauge
+import qualified Data.Ekg.Counter.Internal as Counter
+import qualified Data.Ekg.Label.Internal as Label
+import qualified Data.Ekg.PullGauge.Internal as PullGauge
 import qualified Data.Text as T
 import qualified Data.HashMap.Strict as M
 import Data.IORef (IORef, atomicModifyIORef, newIORef)
