@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
 -- | This module defines a type for mutable, integer-valued counters.
 -- Counters are non-negative, monotonically increasing values and can
 -- be used to track e.g. the number of requests served since program
@@ -103,7 +102,7 @@ hasPullGauge :: T.Text -- ^ PullGauge name
 hasPullGauge name registry = hasRef name $ userPullGauges registry
 
 hasRef :: Ref r t => T.Text
-       -> IORef (M.HashMap T.Text (r))
+       -> IORef (M.HashMap T.Text r)
        -> IO Bool
 hasRef name ioref = do
                 cs <- readIORef ioref

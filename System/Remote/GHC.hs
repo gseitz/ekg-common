@@ -36,18 +36,19 @@ emptyGCStats = Stats.GCStats
     }
 
 getGcStats :: IO Stats.GCStats
-getGcStats = do
+getGcStats =
 #if MIN_VERSION_base(4,6,0)
-    enabled <- Stats.getGCStatsEnabled
-    if enabled
-        then Stats.getGCStats
-        else return emptyGCStats
+    do
+        enabled <- Stats.getGCStatsEnabled
+        if enabled
+            then Stats.getGCStats
+            else return emptyGCStats
 #else
     Stats.getGCStats
 #endif
 
 initializeBuiltInStats :: Registry -> IO ()
-initializeBuiltInStats reg = do      
+initializeBuiltInStats reg = do
     intLvl Stats.bytesAllocated "bytes_allocated"
     intLvl Stats.numGcs "num_gcs"
     intLvl Stats.parMaxBytesCopied "par_max_bytes_copied"
@@ -71,7 +72,7 @@ initializeBuiltInStats reg = do
     intLvl Stats.parAvgBytesCopied "par_avg_bytes_copied"
 #endif
     intLvl Stats.parMaxBytesCopied "par_max_bytes_copied"
-    return () 
-  where 
+    return ()
+  where
     intLvl f name = newPullGauge name reg $ fmap (fromIntegral . f) getGcStats
     doubleLvl f name = newPullGauge name reg $ fmap (fromIntegral . round . f) getGcStats

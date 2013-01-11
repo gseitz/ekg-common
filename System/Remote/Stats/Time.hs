@@ -10,20 +10,27 @@ module System.Remote.Stats.Time
     , toDays
 	) where
 
-data TimeUnit = Day 
-              | Hour 
-              | Minute 
-              | Second 
-              | Millisecond 
-              | Microsecond 
+data TimeUnit = Day
+              | Hour
+              | Minute
+              | Second
+              | Millisecond
+              | Microsecond
               | Nanosecond
 
+ns :: Integer
 ns = 1
+us :: Integer
 us = ns * 1000
+ms :: Integer
 ms = us * 1000
+s :: Integer
 s  = ms * 1000
+m :: Integer
 m  = s * 60
+h :: Integer
 h  = m * 60
+d :: Integer
 d  = h * 24
 
 toNanos :: TimeUnit  -- ^ Source unit

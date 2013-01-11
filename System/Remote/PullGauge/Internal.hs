@@ -13,7 +13,7 @@ newtype PullGauge = P { unP :: IO Int }
 
 -- | Create a new, zero initialized, gauge.
 new :: IO Int -> PullGauge
-new valLookup = P valLookup
+new = P
 
 read :: PullGauge -> IO Int
 read pullGauge = unP pullGauge

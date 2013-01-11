@@ -1,5 +1,4 @@
-{-# LANGUAGE CPP, ExistentialQuantification, OverloadedStrings, RecordWildCards,
-  FunctionalDependencies #-}
+{-# LANGUAGE CPP, ExistentialQuantification, OverloadedStrings #-}
 -- | This module provides remote monitoring of a running process.
 module System.Remote.Ekg
     (
@@ -170,15 +169,15 @@ import System.Remote.GHC
 
 -- | All the stats exported by a registry together with a timestamp.
 data Stats = Stats {
-    counters  :: ![(T.Text, Json)],       -- Counters
-    gauges    :: ![(T.Text, Json)],       -- Gauges
-    labels    :: ![(T.Text, Json)],       -- Labels
-    pullGauges    :: ![(T.Text, Json)],       -- PullGauges
-    timestamp ::  {-# UNPACK #-} !Double  -- Milliseconds since epoch
+    counters   :: ![(T.Text, Json)],       -- Counters
+    gauges     :: ![(T.Text, Json)],       -- Gauges
+    labels     :: ![(T.Text, Json)],       -- Labels
+    pullGauges :: ![(T.Text, Json)],       -- PullGauges
+    timestamp  ::  {-# UNPACK #-} !Double  -- Milliseconds since epoch
   }
 
 instance A.ToJSON Stats where
-    toJSON (Stats counters gauges labels pullGauges t) = A.object $
+    toJSON (Stats counters gauges labels pullGauges t) = A.object
         [ "server_timestamp_millis"  .= t
         , "counters"                 .= Assocs counters
         , "gauges"                   .= Assocs gauges

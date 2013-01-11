@@ -14,10 +14,11 @@ import Data.IORef (atomicModifyIORef)
 import qualified Data.Text as T
 
 import System.Remote.Label.Internal
+import System.Remote.Stats.Atomic (atomicWriteIORef)
 
 -- | Set the label to the given value.
 set :: Label -> T.Text -> IO ()
-set (C ref) !i = atomicModifyIORef ref $ \ _ -> (i, ())
+set (C ref) !i = atomicWriteIORef ref i
 
 -- | Set the label to the result of applying the given function to the
 -- value.

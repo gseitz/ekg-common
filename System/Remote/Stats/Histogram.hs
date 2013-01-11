@@ -15,7 +15,7 @@ module System.Remote.Stats.Histogram
     , hStdDev
     ) where
 
-import Control.Monad (when)
+import Control.Monad (when, unless)
 import Data.Int (Int64)
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 
@@ -26,22 +26,22 @@ import qualified System.Remote.Stats.Sample as S
 
 
 data Histogram = forall a. S.Sample a => Histogram
-    a                         -- ^ sample
-    (IORef Int64)             -- ^ min
-    (IORef Int64)             -- ^ max
-    (IORef Int64)             -- ^ sum
-    (IORef Int64)             -- ^ count
-    (IORef (Double, Double))  -- ^ variance
+    !a                         -- ^ sample
+    !(IORef Int64)             -- ^ min
+    !(IORef Int64)             -- ^ max
+    !(IORef Int64)             -- ^ sum
+    !(IORef Int64)             -- ^ count
+    !(IORef (Double, Double))  -- ^ variance
 
 
-default_sample_size :: Int
-default_sample_size = 1028
+defaultSampleSize :: Int
+defaultSampleSize = 1028
 
 newUniformHistogram :: IO Histogram
 newUniformHistogram = do
-    sample <- newUniformSample default_sample_size
-    minR   <- newIORef (maxBound)
-    maxR   <- newIORef (minBound)
+    sample <- newUniformSample defaultSampleSize
+    minR   <- newIORef maxBound
+    maxR   <- newIORef minBound
     sumR   <- newIORef 0
     varR   <- newIORef (-1, 0)
     countR <- newIORef 0
@@ -72,33 +72,31 @@ updateVariance h@(Histogram _ _ _ _ _ varR) value = do
     new <- if oldM == -1
         then return (valued, 0.0)
         else let newM x = oldM + ((valued-oldM) / x)
-                 newS x = oldS + (valued-oldM) * (valued - (newM x))
+                 newS x = oldS + (valued-oldM) * (valued - newM x)
              in do
                  c <- hCount h
-                 return $ (newM $ fromIntegral c, newS $ fromIntegral c)
+                 return (newM $ fromIntegral c, newS $ fromIntegral c)
     succeeded <- atomicModifyIORef varR  $ \t ->
         if t == old
             then (new, True)
             else (t, False)
-    when (not succeeded) $ updateVariance h value
+    unless succeeded $ updateVariance h value
   where
     valued = fromIntegral value
 
 
 
 hCount :: Histogram -> IO Int64
-hCount (Histogram _ _ _ _ countR _) = do 
-    readIORef countR
+hCount (Histogram _ _ _ _ countR _) = readIORef countR
 
 hSum :: Histogram -> IO Int64
-hSum (Histogram _ _ _ sumR _ _) = do 
-    readIORef sumR
+hSum (Histogram _ _ _ sumR _ _) = readIORef sumR
 
 hMean :: Histogram -> IO Double
 hMean h = do
     s <- hSum h
     c <- hCount h
-    return $ (fromIntegral s) / (fromIntegral c)
+    return $ fromIntegral s / fromIntegral c
 
 hMin :: Histogram -> IO Double
 hMin h@(Histogram _ minR _ _ _ _) = do
@@ -125,14 +123,13 @@ hStdDev h = do
     return $ if c > 0 then sqrt v else 0.0
 
 hSnapshot :: Histogram -> IO Snapshot
-hSnapshot (Histogram sample _ _ _ _ _) = do
-    S.snapshot sample
+hSnapshot (Histogram sample _ _ _ _ _) = S.snapshot sample
 
 setMax :: IORef Int64 -> Int64 -> IO ()
-setMax ref val = set ref (<) val
+setMax ref = set ref (<)
 
 setMin :: IORef Int64 -> Int64 -> IO ()
-setMin ref val = set ref (>) val
+setMin ref = set ref (>)
 
 set :: IORef Int64 -> (Int64 -> Int64 -> Bool) -> Int64 -> IO ()
 set ref p val = do

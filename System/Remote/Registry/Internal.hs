@@ -76,10 +76,9 @@ getRef :: Ref r t
        -> IO r
 getRef name new mapRef = do
     empty <- new
-    ref <- atomicModifyIORef mapRef $ \ m ->
+    atomicModifyIORef mapRef $ \ m ->
         case M.lookup name m of
             Nothing  -> let m' = M.insert name empty m
                         in (m', empty)
             Just ref -> (m, ref)
-    return ref
 {-# INLINABLE getRef #-}

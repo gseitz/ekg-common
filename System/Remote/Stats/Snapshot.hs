@@ -59,11 +59,11 @@ getValue :: Double -> Snapshot -> Double
 getValue q (Snapshot xs)
     | len == 0                  = 0.0
     | pos < 1                   = V.head xs
-    | pos >= (fromIntegral len) = V.last xs
+    | pos >= fromIntegral len = V.last xs
     | otherwise                 = lower + (pos - pos') * (upper - lower)
   where
-    pos   = q * (fromIntegral (len + 1))
-    pos'  = (fromIntegral $ floor pos)
+    pos   = q * fromIntegral (len + 1)
+    pos'  = fromIntegral $ floor pos
     len   = V.length xs :: Int
     lower = xs V.! (floor pos - 1)
-    upper = xs V.! (floor pos)
+    upper = xs V.! floor pos
