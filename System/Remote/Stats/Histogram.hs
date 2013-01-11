@@ -101,26 +101,32 @@ hMean h = do
 hMin :: Histogram -> IO Double
 hMin h@(Histogram _ minR _ _ _ _) = do
     c <- hCount h
-    m <- readIORef minR
-    return $ if c > 0 then fromIntegral m else 0.0
+    if c < 1
+        then return 0.0
+        else fromIntegral `fmap` readIORef minR
 
 hMax :: Histogram -> IO Double
 hMax h@(Histogram _ _ maxR _ _ _) = do
     c <- hCount h
-    m <- readIORef maxR
-    return $ if c > 0 then fromIntegral m else 0.0
+    if c < 1
+        then return 0.0
+        else fromIntegral `fmap` readIORef maxR
 
 hVariance :: Histogram -> IO Double
 hVariance h@(Histogram _ _ _ _ _ varR) = do
     c <- hCount h
-    (_, v) <- readIORef varR
-    return $ if c <= 1 then 0.0 else v / (fromIntegral c-1)
+    if c <= 1
+        then return 0.0
+        else do
+            (_, v) <- readIORef varR
+            return $ v / (fromIntegral c-1)
 
 hStdDev :: Histogram -> IO Double
 hStdDev h = do
     c <- hCount h
-    v <- hVariance h
-    return $ if c > 0 then sqrt v else 0.0
+    if c < 1
+        then return 0.0
+        else sqrt `fmap` hVariance h
 
 hSnapshot :: Histogram -> IO Snapshot
 hSnapshot (Histogram sample _ _ _ _ _) = S.snapshot sample
