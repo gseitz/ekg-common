@@ -38,8 +38,10 @@ defaultSampleSize :: Int
 defaultSampleSize = 1028
 
 newUniformHistogram :: IO Histogram
-newUniformHistogram = do
-    sample <- newUniformSample defaultSampleSize
+newUniformHistogram = newHistogram =<< newUniformSample defaultSampleSize
+
+newHistogram :: S.Sample a => a -> IO Histogram
+newHistogram sample = do
     minR   <- newIORef maxBound
     maxR   <- newIORef minBound
     sumR   <- newIORef 0
