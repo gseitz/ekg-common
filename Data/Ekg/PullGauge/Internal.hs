@@ -9,11 +9,11 @@ module Data.Ekg.PullGauge.Internal
 import Prelude hiding (read)
 
 -- | A mutable, integer-valued gauge.
-newtype PullGauge = P { unP :: IO Int }
+newtype PullGauge = C { unc :: IO Int }
 
 -- | Create a new, zero initialized, gauge.
 new :: IO Int -> PullGauge
-new = P
+new = C
 
 read :: PullGauge -> IO Int
-read pullGauge = unP pullGauge
+read pullGauge = unc pullGauge
