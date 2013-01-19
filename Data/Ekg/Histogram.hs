@@ -13,6 +13,7 @@ module Data.Ekg.Histogram
     , hCount
     , hSnapshot
     , hStdDev
+    , captureSnapshot
     ) where
 
 import Control.Monad (when, unless)
@@ -147,5 +148,14 @@ set ref p val = do
   where
     newX x = if p x val then val else x
 
-
+captureSnapshot :: Histogram -> IO HistogramSnapshot
+captureSnapshot h = do
+    c <- hCount h
+    s <- hSum h
+    m <- hMean h
+    std <- hStdDev h
+    mi <- hMin h
+    ma <- hMin h
+    snap <- hSnapshot h
+    return $ HistoSnap snap c s mi ma m std
 

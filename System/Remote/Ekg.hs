@@ -24,6 +24,8 @@ module System.Remote.Ekg
     , Stats(..)
     , takeSnapshot
     , initializeBuiltInStats
+    , readAllRefs
+    , Ref(..)
     , Json
     ) where
 
@@ -173,16 +175,20 @@ data Stats = Stats {
     gauges     :: ![(T.Text, Json)],       -- Gauges
     labels     :: ![(T.Text, Json)],       -- Labels
     pullGauges :: ![(T.Text, Json)],       -- PullGauges
+    histograms :: ![(T.Text, Json)],       -- Histograms
+    meters     :: ![(T.Text, Json)],       -- Meters
     timestamp  ::  {-# UNPACK #-} !Double  -- Milliseconds since epoch
   }
 
 instance A.ToJSON Stats where
-    toJSON (Stats counters gauges labels pullGauges t) = A.object
+    toJSON (Stats counters gauges labels pullGauges histos meters t) = A.object
         [ "server_timestamp_millis"  .= t
         , "counters"                 .= Assocs counters
         , "gauges"                   .= Assocs gauges
         , "labels"                   .= Assocs labels
         , "pull_gauges"              .= Assocs pullGauges
+        , "histograms"               .= Assocs histos
+        , "meters"                   .= Assocs meters
         ]
 
 newtype Assocs = Assocs [(T.Text, Json)]
@@ -204,11 +210,13 @@ readAllRefs mapRef = do
 takeSnapshot :: Registry -> IO Stats
 takeSnapshot reg = do
     counters <- readAllRefs $ Registry.userCounters reg
-    gauges   <- readAllRefs $ Registry.userGauges reg
-    labels   <- readAllRefs $ Registry.userLabels reg
-    pullGauges   <- readAllRefs $ Registry.userPullGauges reg
-    time     <- getTimeMillis
-    return $ Stats counters gauges labels pullGauges time
+    gauges <- readAllRefs $ Registry.userGauges reg
+    labels <- readAllRefs $ Registry.userLabels reg
+    pullGauges <- readAllRefs $ Registry.userPullGauges reg
+    histograms <- readAllRefs $ Registry.userHistograms reg
+    meters <- readAllRefs $ Registry.userMeters reg
+    time <- getTimeMillis
+    return $ Stats counters gauges labels pullGauges histograms meters time
 
 
 -- Existential wrapper used for OO-style polymorphism.

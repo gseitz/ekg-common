@@ -14,9 +14,11 @@ import Data.IORef (IORef, atomicModifyIORef, newIORef)
 
 import qualified Data.Ekg.Counter.Internal as Counter
 import qualified Data.Ekg.Gauge.Internal as Gauge
-import Data.Ekg.Histogram (Histogram)
+import Data.Ekg.Histogram (Histogram, captureSnapshot)
+import Data.Ekg.Histogram.HistogramSnapshot (HistogramSnapshot)
 import qualified Data.Ekg.Label.Internal as Label
 import Data.Ekg.Meter  (Meter)
+import Data.Ekg.Meter.MeterSnapshot
 import qualified Data.Ekg.PullGauge.Internal as PullGauge
 import System.Remote.Gauge
 import System.Remote.Counter
@@ -78,6 +80,12 @@ instance Ref Label T.Text where
 
 instance Ref PullGauge Int where
     read = PullGauge.read
+
+instance Ref Histogram HistogramSnapshot where
+    read = captureSnapshot
+
+instance Ref Meter MeterSnapshot where
+    read = meterSnapshot
 
 
 -- | Lookup a 'Ref' by name in the given map.  If no 'Ref' exists
