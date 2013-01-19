@@ -102,18 +102,18 @@ hMean h = do
     c <- hCount h
     return $ fromIntegral s / fromIntegral c
 
-hMin :: Histogram -> IO Double
+hMin :: Histogram -> IO Int64
 hMin h@(Histogram _ minR _ _ _ _) = do
     c <- hCount h
     if c < 1
-        then return 0.0
+        then return 0
         else fromIntegral `fmap` readIORef minR
 
-hMax :: Histogram -> IO Double
+hMax :: Histogram -> IO Int64
 hMax h@(Histogram _ _ maxR _ _ _) = do
     c <- hCount h
     if c < 1
-        then return 0.0
+        then return 0
         else fromIntegral `fmap` readIORef maxR
 
 hVariance :: Histogram -> IO Double
