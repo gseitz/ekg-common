@@ -19,7 +19,7 @@ extra-source-files:  README.md
 library
   exposed-modules:     Data.Ekg.Histogram
                        Data.Ekg.Histogram.Sample
-                       Data.Ekg.Histogram.Snapshot
+                       Data.Ekg.Histogram.SampleSnapshot
                        Data.Ekg.Histogram.UniformSample
                        Data.Ekg.Meter
                        Data.Ekg.Registry

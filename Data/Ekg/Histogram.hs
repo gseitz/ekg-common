@@ -20,9 +20,10 @@ import Data.Int (Int64)
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 
 import Data.Atomic (atomicWriteIORef)
-import Data.Ekg.Histogram.UniformSample
-import Data.Ekg.Histogram.Snapshot (Snapshot)
+import Data.Ekg.Histogram.HistogramSnapshot
 import qualified Data.Ekg.Histogram.Sample as S
+import Data.Ekg.Histogram.SampleSnapshot (SampleSnapshot)
+import Data.Ekg.Histogram.UniformSample
 
 
 data Histogram = forall a. S.Sample a => Histogram
@@ -130,7 +131,7 @@ hStdDev h = do
         then return 0.0
         else sqrt `fmap` hVariance h
 
-hSnapshot :: Histogram -> IO Snapshot
+hSnapshot :: Histogram -> IO SampleSnapshot
 hSnapshot (Histogram sample _ _ _ _ _) = S.snapshot sample
 
 setMax :: IORef Int64 -> Int64 -> IO ()

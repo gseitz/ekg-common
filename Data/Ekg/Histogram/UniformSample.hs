@@ -14,7 +14,7 @@ import System.Random
 
 import Data.Atomic (atomicWriteIORef)
 import qualified Data.Ekg.Histogram.Sample as S
-import Data.Ekg.Histogram.Snapshot (newSnapshot)
+import Data.Ekg.Histogram.SampleSnapshot (newSnapshot)
 
 
 data UniformSample = UniformSample

@@ -57,6 +57,7 @@ initializeBuiltInStats reg = do
     intLvl Stats.cumulativeBytesUsed "bytes_copied"
     intLvl Stats.cumulativeBytesUsed "current_bytes_used"
     intLvl Stats.cumulativeBytesUsed "current_bytes_slop"
+    intLvl Stats.maxBytesUsed "max_bytes_used"
     intLvl Stats.maxBytesSlop "max_bytes_slop"
     intLvl Stats.peakMegabytesAllocated "peak_megabytes_allocated"
     doubleLvl Stats.mutatorCpuSeconds "mutator_cpu_seconds"

@@ -6,7 +6,7 @@ module Data.Ekg.Histogram.Sample
 
 import Data.Int (Int64)
 
-import Data.Ekg.Histogram.Snapshot (Snapshot)
+import Data.Ekg.Histogram.SampleSnapshot (SampleSnapshot)
 
 class Sample s where
     -- | Gets the current number of values used in the @Sample@.
@@ -19,8 +19,8 @@ class Sample s where
              -> IO ()
 
     -- | Gets a snapshot of the values in the @Sample@.
-    snapshot :: s            -- ^ Sample
-             -> IO Snapshot  -- ^ Snapshot of the current values in the @Sample@
+    snapshot :: s                  -- ^ Sample
+             -> IO SampleSnapshot  -- ^ Snapshot of the current values in the @Sample@
 
     -- | Clears all data in the @Sample@.
     clear    :: s      -- ^ Sample
