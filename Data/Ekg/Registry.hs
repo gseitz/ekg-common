@@ -4,7 +4,8 @@
 -- start.  All operations on counters are thread-safe.
 module Data.Ekg.Registry
     (
-      Registry
+      Registry ( userCounters, userGauges, userLabels, userPullGauges
+               , userHistograms, userMeters)
     , getCounter
     , getGauge
     , getHistogram
