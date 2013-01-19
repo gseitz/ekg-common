@@ -14,7 +14,7 @@ import Data.Int (Int64)
 import Data.IORef (IORef, newIORef, readIORef, atomicModifyIORef)
 
 import Data.Atomic (atomicWriteIORef)
-import Data.Time
+import Data.TimeUnit
 
 data EWMA = EWMA
     !(IORef Double)  -- ^ rate

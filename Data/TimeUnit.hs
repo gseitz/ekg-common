@@ -1,4 +1,5 @@
-module Data.Time
+{-# LANGUAGE OverloadedStrings #-}
+module Data.TimeUnit
 	(
       TimeUnit(..)
     , toNanos
@@ -10,6 +11,9 @@ module Data.Time
     , toDays
 	) where
 
+import qualified Data.Aeson.Types as A
+import Data.Text
+
 data TimeUnit = Day
               | Hour
               | Minute
@@ -17,6 +21,10 @@ data TimeUnit = Day
               | Millisecond
               | Microsecond
               | Nanosecond
+              deriving Show
+
+instance A.ToJSON TimeUnit where
+  toJSON = A.String . pack . show
 
 ns :: Integer
 ns = 1

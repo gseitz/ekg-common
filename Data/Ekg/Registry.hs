@@ -33,7 +33,7 @@ import qualified Data.HashMap.Strict as M
 import Data.IORef (IORef, readIORef)
 import qualified Data.Text as T
 
-import Data.Time
+import Data.TimeUnit
 import qualified Data.Ekg.Counter.Internal as C
 import qualified Data.Ekg.Gauge.Internal as G
 import qualified Data.Ekg.Label.Internal as L

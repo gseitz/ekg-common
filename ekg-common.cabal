@@ -23,6 +23,7 @@ library
                        Data.Ekg.Histogram.UniformSample
                        Data.Ekg.Meter
                        Data.Ekg.Registry
+                       Data.TimeUnit
                        System.Remote.Counter
                        System.Remote.Gauge
                        System.Remote.Label
@@ -33,7 +34,6 @@ library
   other-modules:       Paths_ekg_common
                        Data.Atomic
                        Data.Ekg.EWMA
-                       Data.Time
                        Data.Ekg.Counter.Internal
                        Data.Ekg.Gauge.Internal
                        Data.Ekg.Label.Internal
